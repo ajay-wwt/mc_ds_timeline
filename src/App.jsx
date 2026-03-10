@@ -232,12 +232,14 @@ export default function MCDSTimeline() {
                   </div></div>)}
 
                   {visible.map(ev=>{const t=allTypes[ev.type]||allTypes.other;const x=getX(ev.date);const isActive=activeTooltip?.sid===s.id&&activeTooltip?.eid===ev.id;const isPinned=pinnedEvent?.sid===s.id&&pinnedEvent?.eid===ev.id;const hasPhotos=ev.photos&&ev.photos.length>0;
+                    const firstThumb=hasPhotos?(ev.photos[0].thumb||ev.photos[0].url):null;
+                    const tooltipAbove=ri>=2;
+                    const tooltipPos=tooltipAbove?{bottom:ICON_SIZE+8}:{top:ICON_SIZE+8};
                     return(<div key={ev.id} onMouseEnter={()=>{if(!pinnedEvent)setHoveredEvent({sid:s.id,eid:ev.id});}} onMouseLeave={()=>{if(!pinnedEvent)setHoveredEvent(null);}}
                       onClick={e=>{e.stopPropagation();if(isPinned){setPinnedEvent(null);setDeleteConfirm(null);}else{setPinnedEvent({sid:s.id,eid:ev.id});setHoveredEvent(null);setDeleteConfirm(null);}}}
-                      className="event-pip" style={{position:"absolute",left:x-ICON_SIZE/2,top:ROW_H/2-ICON_SIZE/2,width:ICON_SIZE,height:ICON_SIZE,borderRadius:10,background:isActive?`${t.color}30`:`${t.color}14`,border:`2px solid ${t.color}${isActive?"cc":"55"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,zIndex:isActive?100:1,boxShadow:isActive?`0 0 20px ${t.color}44,0 4px 12px rgba(0,0,0,0.4)`:"none"}}>
-                      {t.icon}
-                      {hasPhotos&&!isActive&&<div style={{position:"absolute",top:-3,right:-3,width:10,height:10,borderRadius:"50%",background:"#3b82f6",border:"2px solid #0c1021",fontSize:5,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>📷</div>}
-                      {isActive&&(<div onClick={e=>e.stopPropagation()} style={{position:"absolute",bottom:ICON_SIZE+8,left:"50%",transform:"translateX(-50%)",background:"#141b30",border:`1px solid ${t.color}55`,borderRadius:10,padding:"10px 14px",whiteSpace:"nowrap",zIndex:1000,minWidth:220,maxWidth:320,boxShadow:`0 12px 40px rgba(0,0,0,0.6),0 0 16px ${t.color}15`}}>
+                      className="event-pip" style={{position:"absolute",left:x-ICON_SIZE/2,top:ROW_H/2-ICON_SIZE/2,width:ICON_SIZE,height:ICON_SIZE,borderRadius:10,background:firstThumb?"transparent":isActive?`${t.color}30`:`${t.color}14`,border:`2px solid ${t.color}${isActive?"cc":"55"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,zIndex:isActive?100:1,boxShadow:isActive?`0 0 20px ${t.color}44,0 4px 12px rgba(0,0,0,0.4)`:"none",overflow:"hidden"}}>
+                      {firstThumb?<img src={firstThumb} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:t.icon}
+                      {isActive&&(<div onClick={e=>e.stopPropagation()} style={{position:"absolute",...tooltipPos,left:"50%",transform:"translateX(-50%)",background:"#141b30",border:`1px solid ${t.color}55`,borderRadius:10,padding:"10px 14px",whiteSpace:"nowrap",zIndex:1000,minWidth:220,maxWidth:320,boxShadow:`0 12px 40px rgba(0,0,0,0.6),0 0 16px ${t.color}15`}}>
                         <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}><span style={{fontSize:16}}>{t.icon}</span><span style={{fontSize:12,fontWeight:700,color:t.color}}>{t.label}</span></div>
                         <div style={{fontSize:12,color:"#e5e7eb",fontWeight:500}}>{s.name}</div>
                         <div style={{fontSize:11,color:"#9ca3af",marginTop:2,whiteSpace:"normal"}}>{ev.label}</div>
